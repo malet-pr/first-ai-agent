@@ -4,9 +4,32 @@ import dev.langchain4j.service.V;
 import io.quarkiverse.langchain4j.RegisterAiService;
 import io.smallrye.mutiny.Multi;
 import model.Book;
+import tools.CatalogTool;
 
-@RegisterAiService
+@RegisterAiService(tools = {CatalogTool.class})
 public interface Librarian {
+
+    @SystemMessage("""
+    You are a professional Librarian. Your goal is to find an ADEQUATE book.
+    
+    WORKFLOW:
+    1. Call `searchOnlineCatalog`.
+    2. Read ALL subjects returned for each book.
+    3. INTERNAL EVALUATION: Compare the subjects to the requested {{genre}}, {{topic}}, and {{audience}}. 
+       - A book is ADEQUATE if at least 3 subjects match the user's intent.
+    4. FINAL OUTPUT: For the single BEST match found, output ONLY this format:
+       VERDICT: [Adequate / Not Adequate]
+       REASON: [1 sentence explaining why]
+       DATA: [Title, Author, ISBN, and the 3 most relevant subjects]
+       
+    DO NOT list all subjects in the final response. Be extremely brief to save time.
+    """)
+    @UserMessage("Search for books about {{topic}} with genre {{genre}}, language {{language}}, audience {{audience}}.")
+    String testSearch(@V("topic") String topic,
+                      @V("genre") String genre,
+                      @V("language") String language,
+                      @V("audience") String audience);
+
     @SystemMessage(SYSTEM_MESSAGE)
     @UserMessage(USER_MESSAGE)
     Book createBook(@V("topic") String topic,
