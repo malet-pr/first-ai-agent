@@ -7,7 +7,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import model.Book;
+import dto.BookDTO;
 import org.jboss.resteasy.reactive.RestQuery;
 
 @ApplicationScoped
@@ -23,9 +23,9 @@ public class LibrarianResource {
                              @QueryParam("genre") String genre,
                              @QueryParam("language") String language,
                              @QueryParam("audience") String audience) {
-        Book book = librarian.createBook(topic,genre,language,audience);
+        BookDTO bookDTO = librarian.createBook(topic,genre,language,audience);
         return Response.status(Response.Status.OK)
-                .entity(book)
+                .entity(bookDTO)
                 .build();
     }
 

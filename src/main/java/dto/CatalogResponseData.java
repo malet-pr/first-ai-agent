@@ -1,4 +1,4 @@
-package model;
+package dto;
 
 public record CatalogResponseData(
      String title,

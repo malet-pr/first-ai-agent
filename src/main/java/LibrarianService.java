@@ -2,10 +2,7 @@ import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.openai.OpenAiChatModel;
-import io.quarkus.smallrye.health.runtime.SmallRyeHealthBuildFixedConfig;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import model.Book;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.Duration;

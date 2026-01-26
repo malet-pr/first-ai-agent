@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import jakarta.enterprise.context.ApplicationScoped;
-import model.CatalogResponseData;
-import model.CatalogResponseWrapper;
+import dto.CatalogResponseData;
+import dto.CatalogResponseWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

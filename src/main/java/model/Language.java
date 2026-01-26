@@ -4,15 +4,13 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-
 @Entity
-@Table(name = "awards")
-public class Award extends PanacheEntity {
+@Table(name = "languages")
+public class Language extends PanacheEntity {
 
     public String name;
 
-    public Integer year;
+    public String code;
 
-    public String category;
-
+    public String shortName;
 }

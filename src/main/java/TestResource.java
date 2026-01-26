@@ -1,9 +1,14 @@
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
-import model.CatalogResponseData;
+import dto.CatalogResponseData;
+import jakarta.ws.rs.core.Response;
+import model.Book;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import tools.CatalogTool;
 
 import java.util.List;
@@ -35,4 +40,17 @@ public class TestResource {
                                                      @QueryParam("audience") String audience) {
         return catalogTool.searchOnlineCatalog(topic, genre, language, audience);
     }
+
+    @POST
+    @Path("/books")
+    @Transactional
+    public Response persistBook(@RequestBody Book book) {
+        try{
+            book.persist();
+            return Response.status(Response.Status.CREATED).entity(book).build();
+        } catch (Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+
 }

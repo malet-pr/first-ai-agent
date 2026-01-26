@@ -3,26 +3,31 @@ import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 import io.quarkiverse.langchain4j.RegisterAiService;
 import io.smallrye.mutiny.Multi;
-import model.Book;
+import dto.BookDTO;
 import tools.CatalogTool;
 
 @RegisterAiService(tools = {CatalogTool.class})
 public interface Librarian {
 
     @SystemMessage("""
-    You are a professional Librarian. Your goal is to find an ADEQUATE book.
+    You are a professional Librarian. Your goal is to find an ADEQUATE bookDTO.
     
     WORKFLOW:
     1. Call `searchOnlineCatalog`.
-    2. Read ALL subjects returned for each book.
+    2. Read ALL subjects returned for each bookDTO.
     3. INTERNAL EVALUATION: Compare the subjects to the requested {{genre}}, {{topic}}, and {{audience}}. 
-       - A book is ADEQUATE if at least 3 subjects match the user's intent.
+       - A bookDTO is ADEQUATE if at least 3 subjects match the user's intent.
     4. FINAL OUTPUT: For the single BEST match found, output ONLY this format:
        VERDICT: [Adequate / Not Adequate]
        REASON: [1 sentence explaining why]
        DATA: [Title, Author, ISBN, and the 3 most relevant subjects]
        
     DO NOT list all subjects in the final response. Be extremely brief to save time.
+    
+    STRICT RULES:
+    - NO PYTHON.
+    - NO CODE BLOCKS unless explicitly asked.
+    - If you feel the urge to write logic, express it as a Java-style pseudo-code comment, but ALWAYS provide the final VERDICT in plain text first.
     """)
     @UserMessage("Search for books about {{topic}} with genre {{genre}}, language {{language}}, audience {{audience}}.")
     String testSearch(@V("topic") String topic,
@@ -32,10 +37,10 @@ public interface Librarian {
 
     @SystemMessage(SYSTEM_MESSAGE)
     @UserMessage(USER_MESSAGE)
-    Book createBook(@V("topic") String topic,
-                             @V("genre") String genre,
-                             @V("language") String language,
-                             @V("audience") String audience);
+    BookDTO createBook(@V("topic") String topic,
+                       @V("genre") String genre,
+                       @V("language") String language,
+                       @V("audience") String audience);
 
     @SystemMessage(SYSTEM_MESSAGE)
     @UserMessage(USER_MESSAGE)
@@ -62,7 +67,7 @@ public interface Librarian {
     """;
 
     final String USER_MESSAGE = """
-    Create a fictional book about {{topic}}, with genre {{genre}},
+    Create a fictional bookDTO about {{topic}}, with genre {{genre}},
     written in {{language}} for a {{audience}} audience.
     """;
 }
