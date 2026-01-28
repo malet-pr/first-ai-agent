@@ -1,3 +1,5 @@
+package librarian;
+
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
@@ -5,32 +7,23 @@ import io.quarkiverse.langchain4j.RegisterAiService;
 import io.smallrye.mutiny.Multi;
 import dto.BookDTO;
 import tools.CatalogTool;
+import tools.SearchDBTool;
 
-@RegisterAiService(tools = {CatalogTool.class})
+@RegisterAiService(tools = {CatalogTool.class, SearchDBTool.class})
 public interface Librarian {
 
     @SystemMessage("""
-    You are a professional Librarian. Your goal is to find an ADEQUATE bookDTO.
-    
-    WORKFLOW:
-    1. Call `searchOnlineCatalog`.
-    2. Read ALL subjects returned for each bookDTO.
-    3. INTERNAL EVALUATION: Compare the subjects to the requested {{genre}}, {{topic}}, and {{audience}}. 
-       - A bookDTO is ADEQUATE if at least 3 subjects match the user's intent.
-    4. FINAL OUTPUT: For the single BEST match found, output ONLY this format:
-       VERDICT: [Adequate / Not Adequate]
-       REASON: [1 sentence explaining why]
-       DATA: [Title, Author, ISBN, and the 3 most relevant subjects]
-       
-    DO NOT list all subjects in the final response. Be extremely brief to save time.
-    
-    STRICT RULES:
-    - NO PYTHON.
-    - NO CODE BLOCKS unless explicitly asked.
-    - If you feel the urge to write logic, express it as a Java-style pseudo-code comment, but ALWAYS provide the final VERDICT in plain text first.
+    - Search catalog.
+    - TASK: Find one ISBN from the catalog that is NOT in the database.
+    - RULES: 1) You must call `searchLocalDatabase` with the list of ISBNs.
+             2) You MUST RESPECT the early termination policy when newBook turns to true.
+             3) You MUST NOT search the same isbn more than once.
+    - OUTPUT RULE: You are an API. You MUST return ONLY the JSON representation of the `Temp` object.
+    - NO PROSE. NO EXPLANATIONS. NO MARKDOWN.
+    - If you find a book, return: {"isbn": "number"}
     """)
     @UserMessage("Search for books about {{topic}} with genre {{genre}}, language {{language}}, audience {{audience}}.")
-    String testSearch(@V("topic") String topic,
+    Temp searchBook(@V("topic") String topic,
                       @V("genre") String genre,
                       @V("language") String language,
                       @V("audience") String audience);
@@ -71,4 +64,3 @@ public interface Librarian {
     written in {{language}} for a {{audience}} audience.
     """;
 }
-

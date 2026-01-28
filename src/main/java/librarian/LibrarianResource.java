@@ -1,3 +1,5 @@
+package librarian;
+
 import io.smallrye.mutiny.Multi;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -39,6 +41,16 @@ public class LibrarianResource {
             @RestQuery String audience) {
 
         return librarian.watchBookBeCreated(topic, genre, language, audience);
+    }
+
+    @GET
+    @Path("books/find")
+    public Response findBook(@QueryParam("topic") String topic,
+                              @QueryParam("genre") String genre,
+                              @QueryParam("language") String language,
+                              @QueryParam("audience") String audience) {
+        Temp resp = librarian.searchBook(topic,genre,language,audience);
+        return Response.status(Response.Status.OK).entity(resp).build();
     }
 
 

@@ -2,6 +2,7 @@ package tools;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import common.BookSearchCache;
 import dev.langchain4j.agent.tool.Tool;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -47,11 +48,11 @@ public class CatalogTool {
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             CatalogResponseWrapper wrapper = objectMapper.readValue(response.body(), CatalogResponseWrapper.class);
-            return wrapper.docs().stream()
+            List<CatalogResponseData> results = wrapper.docs().stream()
                     .filter(doc -> doc.isbn() != null && doc.isbn().length > 0)
                     .map(doc -> {
                         String isbn13 = Arrays.stream(doc.isbn())
-                                .filter(i -> i.startsWith("978"))
+                                .filter(i -> i.startsWith("978") || i.startsWith("979"))
                                 .findFirst()
                                 .orElse(null);
                         String[] relevant = Arrays.stream(doc.subject())
@@ -62,8 +63,9 @@ public class CatalogTool {
                         return new CatalogResponseData(doc.title(), doc.author_name(), relevant, new String[]{isbn13});
                     })
                     .filter(doc -> doc.isbn()[0] != null)
-                    .limit(2)
+                    .limit(3)
                     .toList();
+            return results;
         } catch (Exception e) {
             log.error("Could not reach the catalog: {}", e.getMessage());
             return Collections.emptyList();

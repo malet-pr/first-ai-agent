@@ -1,3 +1,5 @@
+package librarian;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -10,7 +12,6 @@ import jakarta.ws.rs.core.Response;
 import model.Book;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import tools.CatalogTool;
-
 import java.util.List;
 
 @ApplicationScoped
@@ -25,11 +26,12 @@ public class TestResource {
 
     @GET
     @Path("/test-catalog-tool")
-    public String testCatalogTool(@QueryParam("topic") String topic,
+    public Response testCatalogTool(@QueryParam("topic") String topic,
                                   @QueryParam("genre") String genre,
                                   @QueryParam("language") String language,
                                   @QueryParam("audience") String audience) {
-        return librarian.testSearch(topic, genre, language, audience);
+        Temp resp = librarian.searchBook(topic, genre, language, audience);
+        return Response.status(Response.Status.OK).entity(resp).build();
     }
 
     @GET
