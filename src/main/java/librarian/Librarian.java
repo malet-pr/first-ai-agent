@@ -12,31 +12,22 @@ import tools.SearchDBTool;
 @RegisterAiService(tools = {CatalogTool.class, SearchDBTool.class})
 public interface Librarian {
 
-    @SystemMessage("""
-    - Search catalog.
-    - TASK: Find one ISBN from the catalog that is NOT in the database.
-    - RULES: 1) You must call `searchLocalDatabase` with the list of ISBNs.
-             2) You MUST RESPECT the early termination policy when newBook turns to true.
-             3) You MUST NOT search the same isbn more than once.
-    - OUTPUT RULE: You are an API. You MUST return ONLY the JSON representation of the `Temp` object.
-    - NO PROSE. NO EXPLANATIONS. NO MARKDOWN.
-    - If you find a book, return: {"isbn": "number"}
-    """)
-    @UserMessage("Search for books about {{topic}} with genre {{genre}}, language {{language}}, audience {{audience}}.")
+    @SystemMessage(SYSTEM_MESSAGE)
+    @UserMessage(USER_MESSAGE)
     Temp searchBook(@V("topic") String topic,
                       @V("genre") String genre,
                       @V("language") String language,
                       @V("audience") String audience);
 
-    @SystemMessage(SYSTEM_MESSAGE)
-    @UserMessage(USER_MESSAGE)
+    @SystemMessage(SYSTEM_MESSAGE_CREATIVE)
+    @UserMessage(USER_MESSAGE_CREATIVE)
     BookDTO createBook(@V("topic") String topic,
                        @V("genre") String genre,
                        @V("language") String language,
                        @V("audience") String audience);
 
-    @SystemMessage(SYSTEM_MESSAGE)
-    @UserMessage(USER_MESSAGE)
+    @SystemMessage(SYSTEM_MESSAGE_CREATIVE)
+    @UserMessage(USER_MESSAGE_CREATIVE)
     Multi<String> watchBookBeCreated(
             @V("topic") String topic,
             @V("genre") String genre,
@@ -47,6 +38,22 @@ public interface Librarian {
     //////////////////////////////////////////////
 
     final String SYSTEM_MESSAGE = """
+    - Search catalog.
+    - TASK: Find one ISBN from the catalog that is NOT in the database.
+    - RULES: 1) You must call `searchLocalDatabase` with the list of ISBNs.
+             2) You MUST RESPECT the early termination policy when newBook turns to true.
+             3) You MUST NOT search the same isbn more than once.
+    - OUTPUT RULE: You are an API. You MUST return ONLY the JSON representation of the `Temp` object.
+    - NO PROSE. NO EXPLANATIONS. NO MARKDOWN.
+    - If you find a book, return: {"isbn": "number"}
+    """;
+
+    final String USER_MESSAGE = """
+    Search for books about {{topic}} with genre {{genre}},
+    language {{language}}, audience {{audience}}.
+    """;
+
+    final String SYSTEM_MESSAGE_CREATIVE = """
     You are a professional multilingual librarian. 
     If the languege is not specified, default to English. 
     If the audience is not specified, default to general audience.
@@ -59,7 +66,7 @@ public interface Librarian {
     "IMPORTANT: If a field has no data (like awards or reviews), return an empty list [] or null. DO NOT return a plain string or a URL in place of a structured object."
     """;
 
-    final String USER_MESSAGE = """
+    final String USER_MESSAGE_CREATIVE = """
     Create a fictional bookDTO about {{topic}}, with genre {{genre}},
     written in {{language}} for a {{audience}} audience.
     """;
