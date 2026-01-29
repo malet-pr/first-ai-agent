@@ -49,7 +49,7 @@ public class LibrarianResource {
                               @QueryParam("genre") String genre,
                               @QueryParam("language") String language,
                               @QueryParam("audience") String audience) {
-        Temp resp = librarian.searchBook(topic,genre,language,audience);
+        String resp = librarian.searchBook(topic, genre, language, audience);
         return Response.status(Response.Status.OK).entity(resp).build();
     }
 

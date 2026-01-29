@@ -7,7 +7,6 @@ import librarian.Temp;
 import model.Book;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.List;
 
 @ApplicationScoped
 public class SearchDBTool {
@@ -17,24 +16,16 @@ public class SearchDBTool {
     @Inject
     Utils utils;
 
-    @Tool("Checks DB. Returns a JSON object with the ISBN if not found.")
-    public Temp searchLocalDatabase(List<String> isbns) {
-        if (isbns == null || isbns.isEmpty()) {
-            log.info("Empty List");
-            return new Temp("noAdequateBook");
-        }
-        boolean newBook = false;
-        for(String isbn : isbns) {
-            log.info("Inside search DB tool with isbn {}.", isbn);
-            String cleanIsbn = utils.cleanIsbn(isbn);
-            boolean exists = Book.find("isbn", cleanIsbn).firstResultOptional().isPresent();
-            log.info("ISBN {} exists in database? {}.", cleanIsbn, exists);
-            if (!exists) {
-                newBook = true;
-                return new Temp(isbn);
-            }
-        }
-        return new Temp("allBooksInDB");
-    }
 
+    @Tool("Checks DB. Returns the ISBN if not found.")
+    public String searchLocalDatabase(String isbn) {
+        log.info("Searching for ISBN: {}", isbn);
+        String cleanIsbn = utils.cleanIsbn(isbn);
+        boolean exists = Book.find("isbn", cleanIsbn).firstResultOptional().isPresent();
+        if (!exists) {
+            log.info("MATCH! Returning SUCCESS for {}", cleanIsbn);
+            return isbn;
+        }
+        return "ALREADY_EXISTS";
+    }
 }

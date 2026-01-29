@@ -2,7 +2,6 @@ package tools;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import common.BookSearchCache;
 import dev.langchain4j.agent.tool.Tool;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -28,17 +27,18 @@ public class CatalogTool {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Tool("Search a real online catalog for existing books.")
-    public List<CatalogResponseData> searchOnlineCatalog(String topic, String genre, String language, String audience) {
+    public List<String> searchOnlineCatalog(String topic, String genre, String language, String audience) {
         try {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append(URLEncoder.encode(topic, StandardCharsets.UTF_8));
+            if(language != null && !language.isEmpty()) {
+                queryBuilder.append("&language=").append(language);
+            }
             if (genre != null && !genre.isEmpty()) {
                 queryBuilder.append("+subject:").append(URLEncoder.encode(genre, StandardCharsets.UTF_8));
-            } if (audience != null && !audience.isEmpty()) {
-                queryBuilder.append("+subject:(").append(URLEncoder.encode(audience, StandardCharsets.UTF_8)).append(")");
             }
-            if(language != null && !language.isEmpty()) {
-                queryBuilder.append("&lan=").append(language);
+            if (audience != null && !audience.isEmpty()) {
+                queryBuilder.append("+subject:(").append(URLEncoder.encode(audience, StandardCharsets.UTF_8)).append(")");
             }
             queryBuilder.append("&fields=title,author_name,subject,isbn&sort=random&limit=3");
             String finalQuery = queryBuilder.toString().replace("+", "%20");
@@ -65,7 +65,13 @@ public class CatalogTool {
                     .filter(doc -> doc.isbn()[0] != null)
                     .limit(3)
                     .toList();
-            return results;
+            if(results.isEmpty()) {
+                log.info("No books found in catalog tool");
+                return Collections.emptyList();
+            } else {
+                log.info("Found {} books in catalog tool", results.size());
+                return results.stream().map(d -> d.isbn()[0]).toList();
+            }
         } catch (Exception e) {
             log.error("Could not reach the catalog: {}", e.getMessage());
             return Collections.emptyList();

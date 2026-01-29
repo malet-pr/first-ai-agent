@@ -7,7 +7,6 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
-import dto.CatalogResponseData;
 import jakarta.ws.rs.core.Response;
 import model.Book;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
@@ -30,13 +29,13 @@ public class TestResource {
                                   @QueryParam("genre") String genre,
                                   @QueryParam("language") String language,
                                   @QueryParam("audience") String audience) {
-        Temp resp = librarian.searchBook(topic, genre, language, audience);
+        String resp = librarian.searchBook(topic, genre, language, audience);
         return Response.status(Response.Status.OK).entity(resp).build();
     }
 
     @GET
     @Path("/call-catalog-tool")
-    public List<CatalogResponseData> callCatalogTool(@QueryParam("topic") String topic,
+    public List<String> callCatalogTool(@QueryParam("topic") String topic,
                                                      @QueryParam("genre") String genre,
                                                      @QueryParam("language") String language,
                                                      @QueryParam("audience") String audience) {
